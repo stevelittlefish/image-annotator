@@ -231,3 +231,47 @@ export class History {
 function snapshot({ base, shapes }) {
   return { base, shapes: shapes.map(cloneShape) };
 }
+
+/**
+ * Word-wrap `text` into lines no wider than maxW, given measure(str, size) →
+ * width in px at font size `size`. Words too long for a line stay whole (the
+ * font-size search shrinks until they fit). Explicit newlines are kept.
+ */
+export function wrapText(text, size, maxW, measure) {
+  const lines = [];
+  for (const para of String(text).split('\n')) {
+    let line = '';
+    for (const word of para.split(/\s+/).filter(Boolean)) {
+      const next = line ? `${line} ${word}` : word;
+      if (line && measure(next, size) > maxW) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = next;
+      }
+    }
+    lines.push(line);
+  }
+  return lines;
+}
+
+/**
+ * Largest font size (and its wrapped lines) at which `text` fits inside a
+ * w × h box with `fill` (0–1) of each dimension used. Binary search over
+ * whole pixel sizes; returns at least size 1.
+ */
+export function fitText(text, w, h, measure, { fill = 0.85, lineHeight = TEXT_LINE_HEIGHT } = {}) {
+  const maxW = w * fill, maxH = h * fill;
+  const fits = (size) => {
+    const lines = wrapText(text, size, maxW, measure);
+    return lines.length * size * lineHeight <= maxH &&
+      lines.every((l) => measure(l, size) <= maxW) ? lines : null;
+  };
+  let lo = 1, hi = Math.max(1, Math.floor(maxH / lineHeight)), best = { size: 1, lines: wrapText(text, 1, maxW, measure) };
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    const lines = fits(mid);
+    if (lines) { best = { size: mid, lines }; lo = mid + 1; } else { hi = mid - 1; }
+  }
+  return best;
+}

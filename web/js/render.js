@@ -1,5 +1,5 @@
 // Canvas 2D rendering of the document: base raster plus annotation shapes.
-import { normRect, arrowHead, shapeBounds, TEXT_LINE_HEIGHT } from './model.js';
+import { normRect, arrowHead, shapeBounds, fitText, TEXT_LINE_HEIGHT } from './model.js';
 
 export const FONT_FAMILY = 'system-ui, sans-serif';
 const PIXEL_BLOCK = 12;
@@ -115,10 +115,32 @@ function drawCensor(ctx, s, base) {
     // putImageData replaces pixels outright (no compositing), so nothing
     // underneath — base or earlier annotations — shows through.
     ctx.putImageData(img, x, y);
+  } else if (s.mode === 'label') {
+    drawLabel(ctx, r, s.text ?? '');
   } else {
     ctx.fillStyle = '#000';
     ctx.fillRect(r.x, r.y, r.w, r.h);
   }
+}
+
+export const LABEL_BG = '#ff00ff';
+export const LABEL_FG = '#00ffff';
+const LABEL_FONT = (size) => `800 ${size}px ${FONT_FAMILY}`;
+
+/** Magenta box with cyan text auto-sized and wrapped to fill most of it. */
+function drawLabel(ctx, r, text) {
+  ctx.fillStyle = LABEL_BG;
+  ctx.fillRect(r.x, r.y, r.w, r.h);
+  if (!text.trim() || r.w < 4 || r.h < 4) return;
+  const measure = (str, size) => { ctx.font = LABEL_FONT(size); return ctx.measureText(str).width; };
+  const { size, lines } = fitText(text, r.w, r.h, measure);
+  ctx.font = LABEL_FONT(size);
+  ctx.fillStyle = LABEL_FG;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const lh = size * TEXT_LINE_HEIGHT;
+  const top = r.y + r.h / 2 - (lines.length * lh) / 2 + lh / 2;
+  lines.forEach((line, i) => ctx.fillText(line, r.x + r.w / 2, top + i * lh));
 }
 
 function isLight(color) {

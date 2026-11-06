@@ -17,7 +17,7 @@ const textEditor = $('text-editor');
 const SWATCHES = ['#e0303a', '#e933c8', '#ffe14d', '#3cc25a', '#2f8cff', '#a97ae8', '#ffffff', '#111111'];
 const TOOL_KEYS = { v: 'select', c: 'crop', l: 'line', a: 'arrow', r: 'rect', p: 'pen', t: 'text', x: 'censor' };
 
-const settings = loadSettings({ tool: 'arrow', color: '#e0303a', width: 4, textSize: 28, censorMode: 'solid' });
+const settings = loadSettings({ tool: 'arrow', color: '#e0303a', width: 4, textSize: 28, censorMode: 'solid', censorText: 'Censored' });
 
 const state = {
   base: null,        // immutable HTMLCanvasElement — replaced, never drawn on
@@ -164,6 +164,12 @@ view.addEventListener('pointerdown', (e) => {
 
   if (tool === 'select') {
     state.selected = hitTest(state.shapes, x, y, tol);
+    const sel = state.shapes[state.selected];
+    if (sel?.type === 'censor') {
+      $('censor-mode').value = sel.mode ?? 'solid';
+      $('censor-text').value = sel.text ?? '';
+      $('censor-text-label').hidden = sel.mode !== 'label';
+    }
     if (state.selected >= 0) {
       state.drag = { kind: 'move', start: [x, y], orig: cloneShape(state.shapes[state.selected]), pushed: false };
     }
@@ -181,7 +187,7 @@ view.addEventListener('pointerdown', (e) => {
     state.drag = { kind: 'draw', shape: { type: 'pen', points: [[x, y]], ...style() } };
   } else {
     const shape = { type: tool, x1: x, y1: y, x2: x, y2: y, ...style() };
-    if (tool === 'censor') shape.mode = settings.censorMode;
+    if (tool === 'censor') Object.assign(shape, { mode: settings.censorMode, text: settings.censorText });
     state.drag = { kind: 'draw', shape };
   }
   if (state.drag) view.setPointerCapture(e.pointerId);
@@ -537,9 +543,21 @@ $('text-size').addEventListener('change', (e) => {
   saveSettings(settings);
   restyleSelected({ size: settings.textSize });
 });
+function showCensorText() {
+  $('censor-text-label').hidden = settings.censorMode !== 'label';
+}
 $('censor-mode').value = settings.censorMode;
+showCensorText();
+$('censor-text').value = settings.censorText;
+// 'change' (not 'input') so a whole edit is one undo step on a selected label.
+$('censor-text').addEventListener('change', (e) => {
+  settings.censorText = e.target.value;
+  saveSettings(settings);
+  if (state.shapes[state.selected]?.type === 'censor') restyleSelected({ text: settings.censorText });
+});
 $('censor-mode').addEventListener('change', (e) => {
   settings.censorMode = e.target.value;
+  showCensorText();
   saveSettings(settings);
   restyleSelected({ mode: settings.censorMode });
 });

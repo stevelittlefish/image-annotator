@@ -91,6 +91,7 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
 #toolbar svg .fill { fill: currentColor; stroke: none; }
 #toolbar [data-tool].active { background: var(--accent); border-color: var(--accent); color: #17141d; font-weight: 600; }
 #toolbar input[type=color] { width: 100%; height: 1.8rem; padding: 0; border: 1px solid var(--border); background: none; }
+#toolbar textarea { background: var(--panel-2); border: 1px solid var(--border); border-radius: 5px; padding: 0.2rem 0.3rem; color: var(--ink); font: inherit; font-size: 0.8rem; resize: vertical; }
 #toolbar select { background: var(--panel-2); border: 1px solid var(--border); border-radius: 5px; padding: 0.2rem; }
 .swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; }
 .swatches button { height: 1.3rem; padding: 0; border-radius: 4px; }

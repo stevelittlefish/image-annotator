@@ -61,7 +61,11 @@
         <select id="censor-mode" title="Pixelate can sometimes be partially reversed; use solid for anything sensitive">
           <option value="solid">Solid</option>
           <option value="pixelate">Pixelate</option>
+          <option value="label">Label</option>
         </select>
+      </label>
+      <label id="censor-text-label">Censor text
+        <textarea id="censor-text" rows="2" title="Text for Label censor boxes; it auto-sizes to fill the box"></textarea>
       </label>
       <hr>
       <button id="delete" title="Delete selected (Del)" aria-label="Delete selected" disabled>

@@ -11,7 +11,7 @@ than deleting them, so this file only shows outstanding work.
 - [x] Load image via Open, paste (Ctrl+V) or drag-and-drop
 - [x] Crop (drag, Enter to apply) and Resize dialog (px / %, keep aspect)
 - [x] Line, arrow (Shift snaps to 45°), box, freehand pen, text, censor box
-      (solid or pixelate)
+      (solid, pixelate, or label: magenta box with cyan text auto-fitted to the box)
 - [x] Select / move / delete annotations; restyle the selected one from the toolbar
 - [x] Undo / redo across all edits including crop and resize
 - [x] Save PNG and copy PNG to clipboard

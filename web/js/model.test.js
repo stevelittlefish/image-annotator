@@ -3,7 +3,7 @@ import test from 'node:test';
 
 import {
   normRect, clampRect, shapeBounds, translateShape, scaleShape, cropShapes,
-  resizeShapes, resizeDims, hitTest, fitScale, isMeaningful, History,
+  resizeShapes, resizeDims, hitTest, fitScale, isMeaningful, History, wrapText, fitText,
 } from './model.js';
 
 test('normRect handles any drag direction', () => {
@@ -87,4 +87,28 @@ test('History undo/redo round-trips and isolates shape copies', () => {
   assert.equal(h.canRedo, false);
   h.push(redone);
   assert.equal(h.canRedo, false, 'new change clears redo');
+});
+
+// Fake metrics: every character is 0.5em wide.
+const measure = (s, size) => s.length * size * 0.5;
+
+test('wrapText breaks on words and keeps explicit newlines', () => {
+  assert.deepEqual(wrapText('This model is too horny!', 10, 70, measure), ['This model is', 'too horny!']);
+  assert.deepEqual(wrapText('a\nb', 10, 1000, measure), ['a', 'b']);
+});
+
+test('fitText picks the largest size that fills the box', () => {
+  const { size, lines } = fitText('This model is too horny!', 330, 115, measure);
+  // Must fit within 85% of the box...
+  assert.ok(lines.length * size * 1.2 <= 115 * 0.85);
+  assert.ok(lines.every((l) => measure(l, size) <= 330 * 0.85));
+  // ...and one size larger must not.
+  const bigger = wrapText('This model is too horny!', size + 1, 330 * 0.85, measure);
+  assert.ok(bigger.length * (size + 1) * 1.2 > 115 * 0.85 || bigger.some((l) => measure(l, size + 1) > 330 * 0.85));
+  assert.ok(lines.length >= 2, 'wide-ish box wraps onto two lines like the reference');
+});
+
+test('fitText survives tiny boxes and empty text', () => {
+  assert.equal(fitText('hello', 2, 2, measure).size, 1);
+  assert.deepEqual(fitText('', 100, 100, measure).lines, ['']);
 });
