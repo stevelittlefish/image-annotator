@@ -65,7 +65,7 @@ embed.go              # embeds web/ for single-binary releases
   `web/js/*.test.js`, aggregated by `web/js/tests.js` and run via `npm test`
   (no dependencies). Modules needing real canvas/DOM get a browser test that
   self-skips when no Chrome is available.
-- CI: `.gitea/workflows/ci.yaml` — gofmt check, go vet, go test, npm test.
+- CI: `.github/workflows/ci.yaml` (GitHub Actions) — gofmt check, go vet, go test, npm test.
 - Deploy: multi-stage Dockerfile (golang:alpine → alpine), `docker-compose.yml`
   mounting `config.toml` read-only.
 - UI: dark theme via CSS custom properties, `system-ui` font, native `<details>`
