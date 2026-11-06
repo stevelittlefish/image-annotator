@@ -54,7 +54,8 @@ button.primary { background: var(--accent); border-color: var(--accent); color: 
   background: var(--panel);
   border-bottom: 1px solid var(--border);
 }
-#topbar h1 { font-size: 1rem; margin: 0; letter-spacing: 0.02em; }
+#topbar h1 { font-size: 1rem; margin: 0; letter-spacing: 0.02em; display: flex; align-items: center; gap: 0.45rem; }
+h1 .logo { width: 1.4em; height: 1.4em; display: block; }
 .group { display: flex; gap: 0.3rem; }
 .spacer { flex: 1; }
 #status { font-size: 0.8rem; color: var(--muted); }

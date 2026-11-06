@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Dark tile (app background) -->
+  <rect width="32" height="32" rx="7" fill="#2a2733"/>
+  <!-- Label censor bar: magenta with a cyan "text" stripe -->
+  <rect x="4" y="16" width="20" height="10" rx="1.5" fill="#ff00ff"/>
+  <rect x="7.5" y="19.75" width="13" height="2.5" rx="1.25" fill="#00ffff"/>
+  <!-- Red annotation arrow pointing at the bar -->
+  <path d="M27 5L20.5 11.5" stroke="#e0303a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M16.5 15.5l1.6-7.4 5.8 5.8z" fill="#e0303a"/>
+</svg>
