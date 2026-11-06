@@ -1,0 +1,9 @@
+# Image Annotator configuration. All settings live here — no env vars, no flags
+# (except `-config` to point at a different file).
+
+# Address the app listens on.
+listen = ":8481"
+
+# Frontend directory (relative to where the app is run from). When absent, the
+# copy embedded in the binary is served instead.
+web_dir = "web"

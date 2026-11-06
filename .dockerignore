@@ -1,0 +1,9 @@
+.git
+.claude
+bin
+dist
+docs
+*.log
+Dockerfile
+.dockerignore
+docker-compose.yml

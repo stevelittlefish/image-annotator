@@ -1,0 +1,11 @@
+services:
+  image-annotator:
+    build: .
+    image: image-annotator
+    container_name: image-annotator
+    restart: unless-stopped
+    ports:
+      - "8481:8481"
+    volumes:
+      # web_dir won't exist in the container, so the embedded frontend is served.
+      - ./config.toml:/app/config.toml:ro

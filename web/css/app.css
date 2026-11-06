@@ -1,0 +1,163 @@
+:root {
+  --bg: #1e1c24;
+  --panel: #2a2733;
+  --panel-2: #35313f;
+  --ink: #e8e5ef;
+  --muted: #9a94a8;
+  --accent: #a97ae8;
+  --ok: #4fbe8b;
+  --bad: #e0705a;
+  --border: #454055;
+}
+
+* { box-sizing: border-box; }
+/* Elements below set their own display; keep the hidden attribute authoritative. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  /* Nothing here is reading material, and a stray text selection would make
+     Ctrl+C copy the toolbar labels instead of the image. */
+  user-select: none;
+}
+textarea, input { user-select: text; }
+
+button, .btn, select, input {
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--ink);
+}
+
+button, .btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+}
+button:hover:not(:disabled), .btn:hover { border-color: var(--accent); }
+button:disabled { opacity: 0.45; cursor: default; }
+button.primary { background: var(--accent); border-color: var(--accent); color: #17141d; font-weight: 600; }
+
+#topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.4rem 1rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+#topbar h1 { font-size: 1rem; margin: 0; letter-spacing: 0.02em; }
+.group { display: flex; gap: 0.3rem; }
+.spacer { flex: 1; }
+#status { font-size: 0.8rem; color: var(--muted); }
+#status.ok { color: var(--ok); }
+#status.bad { color: var(--bad); }
+
+.file-btn input { display: none; }
+
+#main { flex: 1; display: flex; min-height: 0; }
+
+#toolbar {
+  width: 9rem;
+  padding: 0.6rem;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  overflow-y: auto;
+}
+#toolbar hr { width: 100%; border: 0; border-top: 1px solid var(--border); margin: 0.3rem 0; }
+#toolbar label { display: flex; flex-direction: column; gap: 0.2rem; font-size: 0.75rem; color: var(--muted); }
+#toolbar .tools { display: grid; grid-template-columns: 1fr 1fr; gap: 0.35rem; }
+#toolbar .tools button, #delete { display: flex; align-items: center; justify-content: center; padding: 0.4rem; }
+#toolbar svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#toolbar svg .fill { fill: currentColor; stroke: none; }
+#toolbar [data-tool].active { background: var(--accent); border-color: var(--accent); color: #17141d; font-weight: 600; }
+#toolbar input[type=color] { width: 100%; height: 1.8rem; padding: 0; border: 1px solid var(--border); background: none; }
+#toolbar select { background: var(--panel-2); border: 1px solid var(--border); border-radius: 5px; padding: 0.2rem; }
+.swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.25rem; }
+.swatches button { height: 1.3rem; padding: 0; border-radius: 4px; }
+
+#stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Checkerboard so transparent PNGs read as transparent. */
+  background: repeating-conic-gradient(#25222c 0 25%, #2c2934 0 50%) 0 0 / 20px 20px;
+}
+#stage.dragover { outline: 3px dashed var(--accent); outline-offset: -8px; }
+#empty { color: var(--muted); text-align: center; padding: 2rem; }
+
+#canvas-wrap { position: relative; line-height: 0; box-shadow: 0 2px 16px rgba(0, 0, 0, 0.5); }
+#view { display: block; touch-action: none; }
+#view.tool-select { cursor: default; }
+#view.tool-text { cursor: text; }
+#view:not(.tool-select):not(.tool-text) { cursor: crosshair; }
+
+#text-editor {
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  border: 1px dashed var(--accent);
+  background: rgba(0, 0, 0, 0.25);
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  white-space: pre;
+  font-weight: 600;
+  font-family: system-ui, sans-serif;
+  line-height: 1.2;
+  min-width: 2ch;
+}
+
+#crop-bar {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+}
+#crop-size { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+dialog {
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  min-width: 18rem;
+}
+dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+dialog h2 { font-size: 1rem; margin: 0 0 0.5rem; }
+dialog form { display: flex; flex-direction: column; gap: 0.5rem; }
+dialog label { display: flex; justify-content: space-between; align-items: center; gap: 1rem; font-size: 0.85rem; }
+dialog label.inline { justify-content: flex-start; gap: 0.4rem; }
+dialog input[type=number] { width: 7rem; background: var(--panel-2); border: 1px solid var(--border); border-radius: 4px; padding: 0.2rem 0.4rem; }
+dialog menu { display: flex; justify-content: flex-end; gap: 0.4rem; padding: 0; margin: 0.5rem 0 0; }
+.muted { color: var(--muted); font-size: 0.8rem; margin: 0; }

@@ -1,0 +1,8 @@
+{
+  "name": "image-annotator",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node web/js/tests.js"
+  }
+}

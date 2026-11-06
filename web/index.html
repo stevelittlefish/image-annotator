@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Image Annotator</title>
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header id="topbar">
+    <h1>Image Annotator</h1>
+    <div class="group">
+      <label class="btn file-btn" title="Open an image (or paste with Ctrl+V, or drop a file)">Open<input type="file" id="file-input" accept="image/*"></label>
+      <button id="undo" title="Undo (Ctrl+Z)">Undo</button>
+      <button id="redo" title="Redo (Ctrl+Shift+Z)">Redo</button>
+      <button id="resize" title="Resize image">Resize…</button>
+    </div>
+    <div class="spacer"></div>
+    <span id="status" role="status"></span>
+    <div class="group">
+      <button id="copy" class="primary" title="Copy PNG to clipboard (Ctrl+C)">Copy</button>
+      <button id="save" class="primary" title="Save PNG (Ctrl+S)">Save PNG</button>
+    </div>
+  </header>
+
+  <div id="main">
+    <aside id="toolbar" aria-label="Tools">
+      <div class="tools">
+        <button data-tool="select" title="Select / move (V)" aria-label="Select">
+          <svg viewBox="0 0 24 24"><path d="M6 3l12 9-5.5 1L15 19l-2.5 1.2-2.5-5.6L6 18z"/></svg>
+        </button>
+        <button data-tool="crop" title="Crop (C) — drag, then Enter" aria-label="Crop">
+          <svg viewBox="0 0 24 24"><path d="M7 2v15h15M2 7h15v15"/></svg>
+        </button>
+        <button data-tool="line" title="Line (L)" aria-label="Line">
+          <svg viewBox="0 0 24 24"><path d="M5 19L19 5"/></svg>
+        </button>
+        <button data-tool="arrow" title="Arrow (A)" aria-label="Arrow">
+          <svg viewBox="0 0 24 24"><path d="M5 19L18 6M10 5h9v9"/></svg>
+        </button>
+        <button data-tool="rect" title="Box (R)" aria-label="Box">
+          <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1"/></svg>
+        </button>
+        <button data-tool="pen" title="Freehand (P)" aria-label="Freehand">
+          <svg viewBox="0 0 24 24"><path d="M3 17c2.5-6 5-7 7-2.5S14 19 16 13s3.5-6 5-3.5"/></svg>
+        </button>
+        <button data-tool="text" title="Text (T)" aria-label="Text">
+          <svg viewBox="0 0 24 24"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>
+        </button>
+        <button data-tool="censor" title="Censor box (X)" aria-label="Censor">
+          <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" class="fill"/><path d="M3 4h10M3 20h7"/></svg>
+        </button>
+      </div>
+      <hr>
+      <label>Colour <input type="color" id="color"></label>
+      <div class="swatches" id="swatches"></div>
+      <label>Width <input type="range" id="width" min="1" max="24"></label>
+      <label>Text size <input type="range" id="text-size" min="10" max="120"></label>
+      <label>Censor
+        <select id="censor-mode" title="Pixelate can sometimes be partially reversed; use solid for anything sensitive">
+          <option value="solid">Solid</option>
+          <option value="pixelate">Pixelate</option>
+        </select>
+      </label>
+      <hr>
+      <button id="delete" title="Delete selected (Del)" aria-label="Delete selected" disabled>
+        <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>
+      </button>
+    </aside>
+
+    <section id="stage">
+      <div id="empty">
+        <p><strong>Paste an image</strong> (Ctrl+V), drop a file here, or click <em>Open</em>.</p>
+      </div>
+      <div id="canvas-wrap" hidden>
+        <canvas id="view"></canvas>
+        <textarea id="text-editor" hidden spellcheck="false"></textarea>
+      </div>
+      <div id="crop-bar" hidden>
+        <span id="crop-size"></span>
+        <button id="crop-apply" class="primary">Apply crop (Enter)</button>
+        <button id="crop-cancel">Cancel (Esc)</button>
+      </div>
+    </section>
+  </div>
+
+  <dialog id="resize-dialog">
+    <form method="dialog">
+      <h2>Resize image</h2>
+      <p class="muted" id="resize-current"></p>
+      <label>Width <input type="number" id="resize-w" min="1" required></label>
+      <label>Height <input type="number" id="resize-h" min="1" required></label>
+      <label class="inline"><input type="checkbox" id="resize-aspect" checked> Keep aspect ratio</label>
+      <label>Percent <input type="number" id="resize-pct" min="1" max="1000" value="100"></label>
+      <menu>
+        <button value="cancel" formnovalidate>Cancel</button>
+        <button value="ok" class="primary">Resize</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
