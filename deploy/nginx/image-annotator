@@ -1,0 +1,34 @@
+# nginx site for Image Annotator (matches the house style used by the other
+# seaslug.io sites: wildcard cert, proxy_params, plain localhost upstream).
+#
+# Install on the server:
+#   sudo cp deploy/nginx/image-annotator /etc/nginx/sites-available/image-annotator
+#   sudo ln -s /etc/nginx/sites-available/image-annotator /etc/nginx/sites-enabled/
+#   sudo nginx -t && sudo systemctl reload nginx
+#
+# Serving over https also makes "Copy to clipboard" work, which browsers only
+# allow in a secure context.
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name annotator.seaslug.io;
+
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name annotator.seaslug.io;
+
+    ssl_certificate /etc/letsencrypt/live/seaslug-wildcard/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/seaslug-wildcard/privkey.pem;
+
+    # Static frontend only: images never leave the browser, so no large
+    # bodies, websockets or long timeouts are needed.
+    location / {
+        proxy_pass http://localhost:8481;
+        include proxy_params;
+    }
+}
