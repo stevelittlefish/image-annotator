@@ -258,7 +258,7 @@ function deleteSelected() {
 function restyleSelected(patch) {
   const s = state.shapes[state.selected];
   if (!s) return;
-  const p = Object.fromEntries(Object.entries(patch).filter(([k]) => k in s));
+  const p = Object.fromEntries(Object.entries(patch).filter(([k, v]) => k in s && s[k] !== v));
   if (!Object.keys(p).length) return;
   commit(() => {
     const shapes = state.shapes.slice();
@@ -549,7 +549,13 @@ function showCensorText() {
 $('censor-mode').value = settings.censorMode;
 showCensorText();
 $('censor-text').value = settings.censorText;
-// 'change' (not 'input') so a whole edit is one undo step on a selected label.
+// Track every keystroke in settings so a new box drawn before the field blurs
+// gets the current text; restyle a selected label only on 'change' so a whole
+// edit is one undo step.
+$('censor-text').addEventListener('input', (e) => {
+  settings.censorText = e.target.value;
+  saveSettings(settings);
+});
 $('censor-text').addEventListener('change', (e) => {
   settings.censorText = e.target.value;
   saveSettings(settings);
