@@ -54,6 +54,13 @@ export function drawShape(ctx, s, base) {
       ctx.strokeRect(r.x, r.y, r.w, r.h);
       break;
     }
+    case 'ellipse': {
+      const r = normRect(s.x1, s.y1, s.x2, s.y2);
+      ctx.beginPath();
+      ctx.ellipse(r.x + r.w / 2, r.y + r.h / 2, r.w / 2, r.h / 2, 0, 0, Math.PI * 2);
+      ctx.stroke();
+      break;
+    }
     case 'censor':
       drawCensor(ctx, s, base);
       break;

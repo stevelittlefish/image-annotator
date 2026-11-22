@@ -55,6 +55,34 @@ test('hitTest finds the topmost shape and ignores rect interiors', () => {
   assert.equal(hitTest(shapes, 500, 500), -1);
 });
 
+test('hitTest handles ellipse outlines, interiors, and corners', () => {
+  const shapes = [
+    { type: 'censor', x1: 0, y1: 0, x2: 200, y2: 100 },
+    { type: 'ellipse', x1: 20, y1: 10, x2: 180, y2: 90, width: 4 }, // center (100, 50), rx=80, ry=40
+  ];
+  assert.equal(hitTest(shapes, 100, 10), 1, 'top of ellipse');
+  assert.equal(hitTest(shapes, 180, 50), 1, 'right of ellipse');
+  assert.equal(hitTest(shapes, 100 + 80 * Math.SQRT1_2, 50 + 40 * Math.SQRT1_2), 1, 'diagonal on curve');
+  assert.equal(hitTest(shapes, 100, 50), 0, 'center falls through to shape underneath');
+  assert.equal(hitTest(shapes, 22, 12), 0, 'bounding-box corner outside ellipse falls through');
+
+  // Very eccentric ellipse: point on major axis inside stroke reach still hits.
+  const thin = [{ type: 'ellipse', x1: 0, y1: 0, x2: 200, y2: 10, width: 4 }];
+  assert.equal(hitTest(thin, 100, 5), 0);
+  assert.equal(hitTest(thin, 100, 30), -1);
+});
+
+test('ellipse translates, crops, scales, and validates meaningfulness', () => {
+  const e = { type: 'ellipse', x1: 10, y1: 20, x2: 50, y2: 40, width: 4 };
+  assert.deepEqual(shapeBounds(e), { x: 10, y: 20, w: 40, h: 20 });
+  const cropped = cropShapes([e], { x: 5, y: 10, w: 100, h: 100 })[0];
+  assert.deepEqual([cropped.x1, cropped.y1, cropped.x2, cropped.y2], [5, 10, 45, 30]);
+  const scaled = scaleShape(e, 2, 0.5);
+  assert.deepEqual([scaled.x1, scaled.y1, scaled.x2, scaled.y2, scaled.width], [20, 10, 100, 20, 4]);
+  assert.equal(isMeaningful({ type: 'ellipse', x1: 1, y1: 1, x2: 2, y2: 2 }), false);
+  assert.equal(isMeaningful(e), true);
+});
+
 test('shapeBounds of pen and text', () => {
   assert.deepEqual(shapeBounds({ type: 'pen', points: [[5, 9], [1, 3]] }), { x: 1, y: 3, w: 4, h: 6 });
   assert.deepEqual(shapeBounds({ type: 'text', x: 1, y: 2, text: 'x', size: 10, measured: { w: 7, h: 12 } }),

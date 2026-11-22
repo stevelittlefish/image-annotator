@@ -15,7 +15,7 @@ const stage = $('stage');
 const textEditor = $('text-editor');
 
 const SWATCHES = ['#e0303a', '#e933c8', '#ffe14d', '#3cc25a', '#2f8cff', '#a97ae8', '#ffffff', '#111111'];
-const TOOL_KEYS = { v: 'select', c: 'crop', l: 'line', a: 'arrow', r: 'rect', p: 'pen', t: 'text', x: 'censor' };
+const TOOL_KEYS = { v: 'select', c: 'crop', l: 'line', a: 'arrow', r: 'rect', e: 'ellipse', p: 'pen', t: 'text', x: 'censor' };
 
 const settings = loadSettings({ tool: 'arrow', color: '#e0303a', width: 4, textSize: 28, censorMode: 'solid', censorText: 'Censored' });
 
@@ -150,6 +150,13 @@ function snap45(x1, y1, x2, y2) {
   return [x1 + len * Math.cos(ang), y1 + len * Math.sin(ang)];
 }
 
+/** Constrain a drag to a square/circle (Shift while drawing boxes/ellipses). */
+function snapSquare(x1, y1, x2, y2) {
+  const dx = x2 - x1, dy = y2 - y1;
+  const side = Math.max(Math.abs(dx), Math.abs(dy));
+  return [x1 + (dx < 0 ? -side : side), y1 + (dy < 0 ? -side : side)];
+}
+
 function style() {
   return { color: settings.color, width: Number(settings.width) };
 }
@@ -215,6 +222,7 @@ view.addEventListener('pointermove', (e) => {
     if (Math.hypot(x - last[0], y - last[1]) >= 1 / state.scale) d.shape.points.push([x, y]);
   } else {
     if (e.shiftKey && (d.shape.type === 'line' || d.shape.type === 'arrow')) [x, y] = snap45(d.shape.x1, d.shape.y1, x, y);
+    else if (e.shiftKey && (d.shape.type === 'rect' || d.shape.type === 'ellipse')) [x, y] = snapSquare(d.shape.x1, d.shape.y1, x, y);
     d.shape.x2 = x;
     d.shape.y2 = y;
   }

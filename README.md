@@ -13,7 +13,7 @@ your browser: nothing is uploaded anywhere.
 
 - **Get an image in:** paste (Ctrl+V), drag and drop, or Open
 - **Crop and resize**
-- **Draw:** lines, arrows, boxes, freehand, text
+- **Draw:** lines, arrows, boxes, ellipses, freehand, text
 - **Censor boxes:** solid black, pixelate, or *label*, which is a magenta box with
   cyan text auto-sized to fill it
 - **Move, restyle or delete** annotations after drawing them
@@ -30,9 +30,10 @@ your browser: nothing is uploaded anywhere.
 | C | Crop (Enter to apply) | | Ctrl+C | Copy PNG |
 | L | Line | | Ctrl+S | Save PNG |
 | A | Arrow (Shift snaps to 45°) | | Ctrl+Z | Undo |
-| R | Box | | Ctrl+Shift+Z | Redo |
-| P | Freehand | | Del | Delete selected |
-| T | Text | | Esc | Cancel / deselect |
+| R | Box (Shift for square) | | Ctrl+Shift+Z | Redo |
+| E | Ellipse (Shift for circle) | | Del | Delete selected |
+| P | Freehand | | Esc | Cancel / deselect |
+| T | Text | | | |
 | X | Censor | | | |
 
 ## Running it

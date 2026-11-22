@@ -2,7 +2,7 @@
 // undo history. No DOM or canvas access, so it runs under node:test.
 //
 // Shapes are plain JSON objects in image pixel coordinates:
-//   line / arrow / rect / censor: { type, x1, y1, x2, y2, color, width, mode? }
+//   line / arrow / rect / ellipse / censor: { type, x1, y1, x2, y2, color, width, mode? }
 //   pen:  { type, points: [[x, y], ...], color, width }
 //   text: { type, x, y, text, size, color }   (x, y = top-left of first line)
 
@@ -124,6 +124,30 @@ function distToSegment(px, py, x1, y1, x2, y2) {
   return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
 }
 
+/** Distance from (x, y) to the outline of an axis-aligned ellipse at (cx, cy). */
+function distToEllipse(x, y, cx, cy, rx, ry) {
+  if (rx <= 0) return distToSegment(x, y, cx, cy - ry, cx, cy + ry);
+  if (ry <= 0) return distToSegment(x, y, cx - rx, cy, cx + rx, cy);
+  const px = Math.abs(x - cx), py = Math.abs(y - cy);
+  let tx = Math.SQRT1_2, ty = Math.SQRT1_2;
+  const a2 = rx * rx, b2 = ry * ry;
+  for (let i = 0; i < 6; i++) {
+    const ex = ((a2 - b2) * tx * tx * tx) / rx;
+    const ey = ((b2 - a2) * ty * ty * ty) / ry;
+    const r = Math.hypot(rx * tx - ex, ry * ty - ey);
+    const qx = px - ex, qy = py - ey;
+    const q = Math.hypot(qx, qy);
+    if (q === 0) break;
+    tx = Math.min(1, Math.max(0, (qx * (r / q) + ex) / rx));
+    ty = Math.min(1, Math.max(0, (qy * (r / q) + ey) / ry));
+    const t = Math.hypot(tx, ty);
+    if (t === 0) { tx = 1; ty = 0; break; }
+    tx /= t;
+    ty /= t;
+  }
+  return Math.hypot(px - rx * tx, py - ry * ty);
+}
+
 /** Is (x, y) on shape s, within tol image pixels? */
 export function hitShape(s, x, y, tol) {
   const reach = tol + (s.width ?? 0) / 2;
@@ -145,6 +169,10 @@ export function hitShape(s, x, y, tol) {
       const inOuter = x >= r.x - reach && x <= r.x + r.w + reach && y >= r.y - reach && y <= r.y + r.h + reach;
       const inInner = x > r.x + reach && x < r.x + r.w - reach && y > r.y + reach && y < r.y + r.h - reach;
       return inOuter && !inInner;
+    }
+    case 'ellipse': {
+      const r = normRect(s.x1, s.y1, s.x2, s.y2);
+      return distToEllipse(x, y, r.x + r.w / 2, r.y + r.h / 2, r.w / 2, r.h / 2) <= reach;
     }
     default: {
       const r = shapeBounds(s);
